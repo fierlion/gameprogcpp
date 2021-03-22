@@ -17,6 +17,21 @@ struct Vector2
 	float y;
 };
 
+struct Ball
+{
+	Vector2 BallVel;
+	Vector2 BallPos;
+};
+
+class Paddle
+{
+public:
+	void UpdatePaddlePos(float deltaTime);
+// make private with setters/getters
+	Vector2 PaddlePos;
+	int PaddleDir;
+};
+
 // Game class
 class Game
 {
@@ -43,6 +58,8 @@ private:
 	// Game should continue to run
 	bool mIsRunning;
 	
+	Paddle paddle1;
+	Paddle paddle2;
 	// Pong specific
 	// Direction of paddle 1
 	int mPaddle1Dir;
@@ -52,6 +69,9 @@ private:
 	Vector2 mPaddle1Pos;
 	// Position of paddle 2
 	Vector2 mPaddle2Pos;
+
+	Ball ball1;
+
 	// Position of ball
 	Vector2 mBallPos;
 	// Velocity of ball
