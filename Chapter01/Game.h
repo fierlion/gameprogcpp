@@ -8,6 +8,9 @@
 
 #pragma once
 #include "SDL/SDL.h"
+#include <iostream>
+#include <vector>
+#include <typeinfo>
 
 // Vector2 struct just stores x/y coordinates
 // (for now)
@@ -71,6 +74,8 @@ private:
 	Vector2 mPaddle2Pos;
 
 	Ball ball1;
+	Ball ball2;
+	std::vector<struct Ball*> balls;
 
 	// Position of ball
 	Vector2 mBallPos;

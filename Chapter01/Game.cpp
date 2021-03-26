@@ -74,6 +74,14 @@ bool Game::Initialize()
 	ball1.BallVel.x = -200.0f;
 	ball1.BallVel.y = 235.0f;
 
+	ball2.BallPos.x = 768.0f / 2.0f;
+	ball2.BallPos.y = 1024.0f / 2.0f;
+	ball2.BallVel.x = -200.0f;
+	ball2.BallVel.y = 235.0f;
+
+	balls.push_back(&ball1);
+	balls.push_back(&ball2);
+
 	return true;
 }
 
@@ -155,55 +163,56 @@ void Game::UpdateGame()
 	paddle1.UpdatePaddlePos(deltaTime);
 	paddle2.UpdatePaddlePos(deltaTime);
 
-	// Update ball position based on ball velocity
-	ball1.BallPos.y += ball1.BallVel.y * deltaTime;
-	ball1.BallPos.x += ball1.BallVel.x * deltaTime;
+	for (auto& thisBall : balls) {
+	 	thisBall->BallPos.y += thisBall->BallVel.y * deltaTime;
+	    thisBall->BallPos.x += thisBall->BallVel.x * deltaTime;
 
-	// Bounce if needed
-	// Did we intersect with paddle 1?
-	float diff = paddle1.PaddlePos.y - ball1.BallPos.y;
-	// Take absolute value of difference
-	diff = (diff > 0.0f) ? diff : -diff;
-	if (
-		// Our y-difference is small enough
-		diff <= paddleH / 2.0f &&
-		// We are in the correct x-position
-		ball1.BallPos.x <= 25.0f && ball1.BallPos.x >= 20.0f &&
-		// The ball is moving to the left
-		ball1.BallVel.x < 0.0f)
-	{
-		ball1.BallVel.x *= -1.0f;
-	}
+		// Bounce if needed
+		// Did we intersect with paddle 1?
+		float diff = paddle1.PaddlePos.y - thisBall->BallPos.y;
+		// Take absolute value of difference
+		diff = (diff > 0.0f) ? diff : -diff;
+		if (
+			// Our y-difference is small enough
+			diff <= paddleH / 2.0f &&
+			// We are in the correct x-position
+			thisBall->BallPos.x <= 25.0f && thisBall->BallPos.x >= 20.0f &&
+			// The ball is moving to the left
+			thisBall->BallVel.x < 0.0f)
+		{
+			thisBall->BallVel.x *= -1.0f;
+		}
 
-	// Did we intersect with paddle 2?
-	float diff2 = paddle2.PaddlePos.y - ball1.BallPos.y;
-	diff2 = (diff2 > 0.0f) ? diff2 : -diff2;
-	if (
-		// Our y-difference is small enough
-		diff2 <= paddleH / 2.0f &&
-		// We are in the correct x-position
-	    ball1.BallPos.x >= (1024.0f - thickness - edgeBuffer) &&
-		// The ball is moving to the right
-		ball1.BallVel.x >= 0.0f)
-	{
-		ball1.BallVel.x *= -1.0f;
-	}
-	// Did the ball go off the screen? (if so, end game)
-	else if (ball1.BallPos.x <= 0.0f || ball1.BallPos.x >= 1024.0f)
-	{
-		mIsRunning = false;
-	}
-	
-	// Did the ball collide with the top wall?
-	if (ball1.BallPos.y <= thickness && ball1.BallVel.y < 0.0f)
-	{
-		ball1.BallVel.y *= -1;
-	}
-	// Did the ball collide with the bottom wall?
-	else if (ball1.BallPos.y >= (768 - thickness) &&
-		ball1.BallVel.y > 0.0f)
-	{
-		ball1.BallVel.y *= -1;
+		// Did we intersect with paddle 2?
+		float diff2 = paddle2.PaddlePos.y - thisBall->BallPos.y;
+		diff2 = (diff2 > 0.0f) ? diff2 : -diff2;
+		if (
+			// Our y-difference is small enough
+			diff2 <= paddleH / 2.0f &&
+			// We are in the correct x-position
+		    thisBall->BallPos.x >= (1024.0f - thickness - edgeBuffer) &&
+			// The ball is moving to the right
+			thisBall->BallVel.x >= 0.0f)
+		{
+			thisBall->BallVel.x *= -1.0f;
+		}
+		// Did the ball go off the screen? (if so, end game)
+		if (thisBall->BallPos.x <= 0.0f || thisBall->BallPos.x >= 1024.0f)
+		{
+			mIsRunning = false;
+		}
+
+		// Did the ball collide with the top wall?
+		if (thisBall->BallPos.y <= thickness && thisBall->BallVel.y < 0.0f)
+		{
+			thisBall->BallVel.y *= -1;
+		}
+		// Did the ball collide with the bottom wall?
+		else if (thisBall->BallPos.y >= (768 - thickness) &&
+			thisBall->BallVel.y > 0.0f)
+		{
+			thisBall->BallVel.y *= -1;
+		}
 	}
 }
 
@@ -255,14 +264,17 @@ void Game::GenerateOutput()
 	};
 	SDL_RenderFillRect(mRenderer, &paddleDraw2);
 	
-	// Draw ball
-	SDL_Rect ball{	
-		static_cast<int>(ball1.BallPos.x - thickness/2),
-		static_cast<int>(ball1.BallPos.y - thickness/2),
-		thickness,
-		thickness
-	};
-	SDL_RenderFillRect(mRenderer, &ball);
+
+	for (auto& thisBall : balls) {
+		// Draw ball
+		SDL_Rect ball{
+			static_cast<int>(thisBall->BallPos.x - thickness / 2),
+			static_cast<int>(thisBall->BallPos.y - thickness / 2),
+			thickness,
+			thickness
+		};
+		SDL_RenderFillRect(mRenderer, &ball);
+	}
 	
 	// Swap front buffer and back buffer
 	SDL_RenderPresent(mRenderer);
