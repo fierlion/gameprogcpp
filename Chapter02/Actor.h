@@ -20,6 +20,7 @@ public:
 	};
 
 	Actor(class Game* game);
+	// Destructor
 	virtual ~Actor();
 
 	// Update function called from Game (not overridable)
@@ -30,6 +31,8 @@ public:
 	virtual void UpdateActor(float deltaTime);
 
 	// Getters/setters
+	// The `&` is a reference identifier (as opposed to a pointer)
+	// A reference must be initialized and can not be changed, unlike a pointer.
 	const Vector2& GetPosition() const { return mPosition; }
 	void SetPosition(const Vector2& pos) { mPosition = pos; }
 	float GetScale() const { return mScale; }
